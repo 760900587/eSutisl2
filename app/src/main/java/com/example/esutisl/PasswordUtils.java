@@ -59,8 +59,7 @@ public class PasswordUtils {
             SharedPreferences sp = context.getSharedPreferences("data", Context.MODE_APPEND);
             long modifyErrorTime = sp.getLong("modifyErrorTime", 0L);
             int modifyErrorNumber = sp.getInt("modifyErrorNumber", 0);
-
-            long TIME=30000*modifyErrorNumber;
+            long TIME=300000*modifyErrorNumber;
             Mysql mysql1 = new Mysql(context);
             Bean select = mysql1.select();
             int count = select.getCount();
@@ -74,10 +73,6 @@ public class PasswordUtils {
                     map.put("TIMER", SETCOUNT);
                     return map;
                 } else {
-                /*map.put("FIST", LOGON_FAILED);
-                map.put(" FAILURE_number", 0L);
-                map.put("TIMER", select.getSetcount());
-                return map;*/
                     if (modifyFist == 1) {
                         //count值重置
                         modifyFist = LOGIN_CHANCES;
@@ -92,8 +87,8 @@ public class PasswordUtils {
                         editor.putInt("modifyErrorNumber",sp1.getInt("modifyErrorNumber",0)+1);
                         editor.commit();
                         map.put("FIST", LOGON_FAILED);
-                        map.put("FAILURE", WAIT_TIME);
-                        map.put("TIMER", select.getCount());
+                        map.put("FAILURE",select.getCount());
+                        map.put("TIMER", TimeUtils.formatTime(TIME));
                         return map;
                     } else {
                         modifyFist--;
@@ -168,7 +163,6 @@ public class PasswordUtils {
             Mysql mysql1 = new Mysql(context);
             Bean bean = new Bean();
             bean.setCount(COUNT);
-//            mysql1.insert(bean);
             map.put("FIST", FIIST);
             map.put("FAILURE", 0);
             map.put("TIMER", 0L);
@@ -180,10 +174,11 @@ public class PasswordUtils {
             /*
                b1 = true 登录成功
                b1 =false "登录失败" 失败三次需要倒计时
+
              */
             @SuppressLint("WrongConstant")
             SharedPreferences sp = context.getSharedPreferences("data", Context.MODE_APPEND);
-            int errorNumber = sp.getInt("errorNumber", 0);
+            int errorNumber = sp.getInt("errorNumber", 1);
             long TIME = 300000L*errorNumber;
             boolean b1 = Second_landing(level, password, context);
             //获取开机时间
@@ -208,14 +203,14 @@ public class PasswordUtils {
                         //LOGIN_CHANCES次登录失败时，获取此时的Java虚拟机运行时刻并保存提交
                         errorTime = SystemClock.elapsedRealtime();
                         Log.i("liuhongliang", "Loagin: 系统时间" + errorTime);
-                        SharedPreferences sp1 = context.getSharedPreferences("data", Context.MODE_PRIVATE);
-                        SharedPreferences.Editor editor = sp1.edit();
+                        SharedPreferences.Editor editor = sp.edit();
                         editor.putLong("errorTime", errorTime);
-                        editor.putInt("errorNumber",sp1.getInt("errorNumber",0)+1);
+                        editor.putInt("errorNumber",sp.getInt("errorNumber",0)+1);
                         editor.commit();
+                        int errorNumber1 = sp.getInt("errorNumber", 0);
                         map.put("FIST", LOGON_FAILED);
-                        map.put("FAILURE", WAIT_TIME);
-                        map.put("TIMER", bean.getCount());
+                        map.put("FAILURE",bean.getCount());
+                        map.put("TIMER", TimeUtils.formatTime(300000L*errorNumber1));
                         return map;
                     } else {
                         fist--;
@@ -231,16 +226,6 @@ public class PasswordUtils {
                     return map;
                 }
             } else {
-                /*long startTime = sp.getLong("errorTime", 0);
-                int errorNumber = sp.getInt("errorNumber", 0);
-                long terminal = startTime + 5 * 60 * 1000*errorNumber;
-                long currentTime=SystemClock.elapsedRealtime();
-                if(startTime!=0&&currentTime<terminal){
-                    long remainingTime = (terminal - currentTime);
-                    String formatTime = TimeUtils.formatTime(remainingTime);
-                    Toast.makeText(context, formatTime, Toast.LENGTH_SHORT).show();
-                    return
-                }*/
                 long time = l - errorTime;
                 long a = TIME - time;
                 map.put("FIST", LOGON_FAILED);
