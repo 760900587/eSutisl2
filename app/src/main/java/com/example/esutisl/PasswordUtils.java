@@ -86,9 +86,10 @@ public class PasswordUtils {
                         editor.putLong("modifyErrorTime", errorTime);
                         editor.putInt("modifyErrorNumber",sp1.getInt("modifyErrorNumber",0)+1);
                         editor.commit();
+                        int modifyErrorNumber1 = sp.getInt("modifyErrorNumber", 0);
                         map.put("FIST", LOGON_FAILED);
                         map.put("FAILURE",select.getCount());
-                        map.put("TIMER", TimeUtils.formatTime(TIME));
+                        map.put("TIMER", TimeUtils.formatTime(30000L*modifyErrorNumber1));
                         return map;
                     } else {
                         modifyFist--;
